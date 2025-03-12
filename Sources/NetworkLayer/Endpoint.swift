@@ -8,12 +8,12 @@
 
 import Foundation
 
-enum Endpoint: EndpointProtocol {
+public enum Endpoint: EndpointProtocol {
     case customRequest(config: APIConfiguration ,path: String, method: HTTPMethod, parameters: [String: Any]?, headers: [String: String]?)
     
 
     // MARK: -  BaseURL
-    var baseURL: String {
+    public var baseURL: String {
         switch self {
         case .customRequest(let config,_,_,_,_):
             return config.baseURL
@@ -22,7 +22,7 @@ enum Endpoint: EndpointProtocol {
     
     
     // MARK: -  Path
-    var path: String {
+    public var path: String {
         switch self {
         case .customRequest(_,let path,_,_,_):
             return path
@@ -30,7 +30,7 @@ enum Endpoint: EndpointProtocol {
     }
     
     // MARK: -  Parameters
-    var parameters: [String : Any]? {
+    public var parameters: [String : Any]? {
         switch self {
         case .customRequest(_,_, _,let params, _):
             return params
@@ -39,7 +39,7 @@ enum Endpoint: EndpointProtocol {
     }
     
     // MARK: -  Headers
-    var headers: [String: String]? {
+    public var headers: [String: String]? {
         switch self {
         case .customRequest(let config, _, _,_, let customHeaders):
             return customHeaders ?? config.defaultHeaders
@@ -47,7 +47,7 @@ enum Endpoint: EndpointProtocol {
     }
     
     // MARK: -  Methods
-    var method: HTTPMethod {
+    public var method: HTTPMethod {
         switch self {
         case .customRequest(_, _, let method, _, _):
             return method

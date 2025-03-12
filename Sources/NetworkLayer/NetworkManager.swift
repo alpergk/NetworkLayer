@@ -12,8 +12,8 @@ import os
 
 @available(iOS 14.0, *)
 @available(macOS 11.0, *)
-actor NetworkManager {
-    static let shared = NetworkManager()
+public actor NetworkManager {
+    public static let shared = NetworkManager()
     private let decoder: JSONDecoder
     private var logger = Logger(subsystem: "unknwnCorp.WeatherApp", category: "Networking")
     
@@ -22,7 +22,7 @@ actor NetworkManager {
         self.decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
     
-    func request<T: Codable>(endpoint: Endpoint) async throws -> T {
+    public func request<T: Codable>(endpoint: Endpoint) async throws -> T {
         
         // MARK: -  Components
         guard var components = URLComponents(string: endpoint.baseURL + endpoint.path) else {

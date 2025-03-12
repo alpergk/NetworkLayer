@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol APIConfiguration {
+public protocol APIConfiguration {
     var baseURL: String { get }
     var defaultHeaders: [String : String]? { get }
 }
