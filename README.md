@@ -15,6 +15,15 @@ A simple and reusable network layer for Swift using `async/await`.
 
 ## Usage
 ```swift
+
+import NetworkLayer
+
+struct WeatherAPIConfiguration: APIConfiguration {
+    var baseURL = "https://api.openweathermap.org/data/2.5"
+    var defaultHeaders:[String: String]? = ["Content-Type": "application/json"]
+}
+ 
+```swift
 import NetworkLayer
 
 let endpoint = Endpoint.customRequest(
