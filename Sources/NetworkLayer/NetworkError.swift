@@ -14,6 +14,7 @@ enum NetworkError: Error {
     case noData
     case unknown(Error)
     
+    
     var localizedDescription: String {
         switch self {
         case .invalidURL:

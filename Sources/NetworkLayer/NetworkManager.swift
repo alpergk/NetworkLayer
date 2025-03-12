@@ -69,7 +69,7 @@ public actor NetworkManager {
             }
             logger.info("✅ Response Status Code: \(httpResponse.statusCode)")
             
-            guard httpResponse.statusCode == 200 else {
+            guard (200...299).contains(httpResponse.statusCode) else {
                 logger.error("❌ Request failed with status code: \(httpResponse.statusCode)")
                 throw NetworkError.requestFailed(statusCode: httpResponse.statusCode)
             }

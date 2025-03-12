@@ -7,8 +7,8 @@
 
 import Foundation
 
-struct NetworkResponse<T: Decodable>: Decodable {
-    let status: Int?
-    let message: String?
-    let data: T?
+public struct NetworkResponse<T: Decodable>: Decodable {
+    public let status: Int?
+    public let message: String?
+    public let data: T?
 }
