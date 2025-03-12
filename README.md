@@ -24,9 +24,9 @@ struct WeatherAPIConfiguration: APIConfiguration {
     var defaultHeaders:[String: String]? = ["Content-Type": "application/json"]
 }
 
-
-### 2. Making a Network Request (`WeatherRequest.swift`)
 ```swift
+### 2. Making a Network Request (`WeatherRequest.swift`)
+
 import NetworkLayer
 
 let endpoint = Endpoint.customRequest(
