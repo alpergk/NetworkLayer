@@ -23,7 +23,7 @@ struct WeatherAPIConfiguration: APIConfiguration {
     var defaultHeaders:[String: String]? = ["Content-Type": "application/json"]
 }
  
-```swift
+
 import NetworkLayer
 
 let endpoint = Endpoint.customRequest(
