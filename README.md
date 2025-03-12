@@ -23,10 +23,10 @@ struct WeatherAPIConfiguration: APIConfiguration {
     var baseURL = "https://api.openweathermap.org/data/2.5"
     var defaultHeaders:[String: String]? = ["Content-Type": "application/json"]
 }
+```
 
-```swift
 ### 2. Making a Network Request (`WeatherRequest.swift`)
-
+```swift
 import NetworkLayer
 
 let endpoint = Endpoint.customRequest(
@@ -45,5 +45,6 @@ Task {
         print(error)
     }
 }
+```
 
 
