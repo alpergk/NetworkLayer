@@ -18,6 +18,10 @@ let package = Package(
         .target(
             name: "NetworkLayer",
             dependencies: []
-        )
+        ),
+        .testTarget(
+                name: "NetworkLayerTests",
+                dependencies: ["NetworkLayer"]
+            )
     ]
 )

@@ -1,6 +1,5 @@
 //
 //  HTTPMethod.swift
-//  WeatherApp
 //
 //  Created by Alper Gok on 12.03.2025.
 //

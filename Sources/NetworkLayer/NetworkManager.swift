@@ -1,90 +1,78 @@
 //
 //  NetworkManager.swift
-//  WeatherApp
 //
 //  Created by Alper Gok on 12.03.2025.
 //
-
 import Foundation
-import os
 
-
-
-@available(iOS 14.0, *)
-@available(macOS 11.0, *)
-public actor NetworkManager {
-    public static let shared = NetworkManager()
+public final class NetworkManager {
+    private let config: APIConfiguration
+    private let session: URLSession
     private let decoder: JSONDecoder
-    private var logger = Logger(subsystem: "unknwnCorp.WeatherApp", category: "Networking")
     
-    private init() {
-        self.decoder = JSONDecoder()
+    public init(
+        config: APIConfiguration,
+        session: URLSession = .shared,
+        decoder: JSONDecoder = JSONDecoder()
+    ) {
+        self.config = config
+        self.session = session
+        self.decoder = decoder
         self.decoder.keyDecodingStrategy = .convertFromSnakeCase
     }
     
-    public func request<T: Codable>(endpoint: Endpoint) async throws -> T {
-        
-        // MARK: -  Components
-        guard var components = URLComponents(string: endpoint.baseURL + endpoint.path) else {
-            logger.error("❌ Invalid URL: \(endpoint.baseURL + endpoint.path)")
+    public func request<T: Decodable>(_ endpoint: Endpoint) async throws -> T {
+        let urlRequest = try buildRequest(for: endpoint)
+        let (data, response) = try await session.data(for: urlRequest)
+        try validate(response: response)
+        return try decoder.decode(T.self, from: data)
+    }
+    
+    // MARK: - Request Builder
+    private func buildRequest(for endpoint: Endpoint) throws -> URLRequest {
+        // 1. Construct URL
+        let urlString = config.baseURL + endpoint.path
+        guard var urlComponents = URLComponents(string: urlString) else {
             throw NetworkError.invalidURL
         }
         
-        // MARK: -  Parameters (For GET Request)
+        // 2. Add query parameters for GET requests
         if endpoint.method == .get, let parameters = endpoint.parameters {
-            components.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)")}
+            urlComponents.queryItems = parameters.map { key, value in
+                URLQueryItem(name: key, value: "\(value)")
+            }
         }
         
-        // MARK: -  Final URL
-        guard let url = components.url else {
-            logger.error("❌ Failed to create valid URL from components")
+        guard let url = urlComponents.url else {
             throw NetworkError.invalidURL
         }
-        logger.info("🌍 Request URL: \(url.absoluteString)")
         
-        // MARK: -  Request
+        // 3. Create request
         var request = URLRequest(url: url)
         request.httpMethod = endpoint.method.rawValue
-        request.allHTTPHeaderFields = endpoint.headers
         
+        // 4. Add headers
+        let allHeaders = config.defaultHeaders.merging(endpoint.headers ?? [:]) { $1 }
+        request.allHTTPHeaderFields = allHeaders
         
-        // MARK: -  Request Body for (POST, PUT, DELETE)
+        // 5. Add body for non-GET requests
         if endpoint.method != .get, let parameters = endpoint.parameters {
-            do {
-                request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
-                logger.info("📦 Request Body: \(String(data: request.httpBody ?? Data(), encoding: .utf8) ?? "Empty")")
-            } catch {
-                logger.error("❌ Failed to encode request body")
-                throw NetworkError.decodingError
-            }
+            request.httpBody = try JSONSerialization.data(withJSONObject: parameters)
         }
         
+        return request
+    }
+    
+    // MARK: - Response Validation
+    private func validate(response: URLResponse) throws {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.invalidResponse
+        }
         
-        do {
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            guard let httpResponse = response as? HTTPURLResponse else {
-                logger.error("❌ Invalid server response")
-                throw NetworkError.noData
-            }
-            logger.info("✅ Response Status Code: \(httpResponse.statusCode)")
-            
-            guard (200...299).contains(httpResponse.statusCode) else {
-                logger.error("❌ Request failed with status code: \(httpResponse.statusCode)")
-                throw NetworkError.requestFailed(statusCode: httpResponse.statusCode)
-            }
-            
-            logger.info("📥 Received Data: \(String(data: data, encoding: .utf8) ?? "Unreadable")")
-            
-            return try decoder.decode(T.self, from: data)
-            
-        }  catch {
-            logger.error("❌ Network/Decoding Error: \(error.localizedDescription)")
-            throw NetworkError.unknown(error)
+        guard (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
         }
     }
 }
-
-
 
 
