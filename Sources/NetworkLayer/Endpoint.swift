@@ -5,7 +5,7 @@
 //
 
 
-public protocol Endpoint {
+public protocol Endpoint: Sendable {
     var path: String { get }
     var method: HTTPMethod { get }
     var parameters: [String: Any]? { get }

@@ -5,7 +5,7 @@
 //
 
 
-public protocol APIConfiguration {
+public protocol APIConfiguration: Sendable {
     var baseURL: String { get }
     var defaultHeaders: [String : String] { get }
 }

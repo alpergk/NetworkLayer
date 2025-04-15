@@ -12,7 +12,11 @@ public final class NetworkManager {
     
     public init(
         config: APIConfiguration,
-        session: URLSession = .shared,
+        session: URLSession = {
+            let config = URLSessionConfiguration.default
+            config.timeoutIntervalForRequest = 30
+            return URLSession(configuration: config)
+        }(),
         decoder: JSONDecoder = JSONDecoder()
     ) {
         self.config = config
